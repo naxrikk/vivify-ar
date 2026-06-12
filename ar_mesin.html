@@ -44,7 +44,7 @@
     .model-btn .label { font-size: 10px; color: rgba(255,255,255,0.85); text-align: center; }
 
     #viewer-wrap {
-      width: 100%; height: calc(100vh - 220px);
+      width: 100%; height: calc(100vh - 260px);
       position: relative; background: #0d0d1a;
     }
 
@@ -59,7 +59,23 @@
       border-top: 1px solid rgba(255,255,255,0.1);
     }
     #info-name { font-size: 14px; font-weight: 700; color: #4fc3f7; margin-bottom: 4px; }
-    #info-desc { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+    #info-desc { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.5; margin-bottom: 10px; }
+
+    #voice-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(79,195,247,0.15);
+      border: 1px solid rgba(79,195,247,0.4);
+      border-radius: 50px; padding: 7px 16px;
+      cursor: pointer;
+    }
+    #voice-btn:active { background: rgba(79,195,247,0.3); }
+    #voice-btn .v-icon { font-size: 15px; }
+    #voice-btn .v-label { font-size: 12px; color: #4fc3f7; font-weight: 600; }
+    #voice-btn.speaking {
+      background: rgba(255,59,48,0.15);
+      border-color: rgba(255,59,48,0.4);
+    }
+    #voice-btn.speaking .v-label { color: #ff3b30; }
 
     #ar-hint {
       position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
@@ -140,6 +156,10 @@
 <div id="info-panel">
   <div id="info-name">Conveyor Belt</div>
   <div id="info-desc">Sistem transportasi material menggunakan belt bergerak yang didukung roller dan motor penggerak.</div>
+  <div id="voice-btn" onclick="speakDesc()">
+    <span class="v-icon">🔊</span>
+    <span class="v-label" id="voice-label">Dengarkan</span>
+  </div>
 </div>
 
 <script>
@@ -148,6 +168,8 @@ const lang = {
     title: "AR Mesin Industri",
     loading: "Memuat model...",
     hint: "Tekan tombol AR di pojok kanan bawah untuk AR",
+    voicePlay: "Dengarkan",
+    voiceStop: "Berhenti",
     conveyor: "Conveyor Belt",
     bubut: "Mesin Bubut",
     cnc: "Mesin CNC",
@@ -163,6 +185,8 @@ const lang = {
     title: "Industrial Machine AR",
     loading: "Loading model...",
     hint: "Tap AR button at bottom right for AR mode",
+    voicePlay: "Listen",
+    voiceStop: "Stop",
     conveyor: "Conveyor Belt",
     bubut: "Lathe Machine",
     cnc: "CNC Machine",
@@ -178,6 +202,8 @@ const lang = {
     title: "工业机械AR",
     loading: "加载模型中...",
     hint: "点击右下角AR按钮进入AR模式",
+    voicePlay: "朗读",
+    voiceStop: "停止",
     conveyor: "传送带",
     bubut: "车床",
     cnc: "数控机床",
@@ -191,6 +217,7 @@ const lang = {
   }
 };
 
+const voiceLang = { id: 'id-ID', en: 'en-US', zh: 'zh-CN' };
 const models = {
   conveyor: 'conveyor_belt.glb',
   bubut: 'mesin_bubut.glb',
@@ -200,15 +227,18 @@ const models = {
 
 let currentLang = 'id';
 let currentModel = 'conveyor';
+let speaking = false;
+
 const mv = document.getElementById('mv');
 const overlay = document.getElementById('loading-overlay');
 
 mv.addEventListener('load', () => overlay.style.display = 'none');
-mv.addEventListener('error', () => {
-  overlay.style.display = 'none';
-});
+mv.addEventListener('error', () => overlay.style.display = 'none');
 
 function setLang(l, el) {
+  window.speechSynthesis.cancel();
+  speaking = false;
+  updateVoiceBtn();
   currentLang = l;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
@@ -216,6 +246,9 @@ function setLang(l, el) {
 }
 
 function setModel(m, el) {
+  window.speechSynthesis.cancel();
+  speaking = false;
+  updateVoiceBtn();
   currentModel = m;
   overlay.style.display = 'flex';
   document.getElementById('loading-text').textContent = lang[currentLang].loading;
@@ -234,12 +267,44 @@ function updateUI() {
     if (t[key]) el.textContent = t[key];
   });
   updateInfo();
+  updateVoiceBtn();
 }
 
 function updateInfo() {
   const t = lang[currentLang];
   document.getElementById('info-name').textContent = t[currentModel];
   document.getElementById('info-desc').textContent = t.desc[currentModel];
+}
+
+function updateVoiceBtn() {
+  const btn = document.getElementById('voice-btn');
+  const label = document.getElementById('voice-label');
+  const t = lang[currentLang];
+  if (speaking) {
+    btn.classList.add('speaking');
+    label.textContent = t.voiceStop;
+  } else {
+    btn.classList.remove('speaking');
+    label.textContent = t.voicePlay;
+  }
+}
+
+function speakDesc() {
+  if (speaking) {
+    window.speechSynthesis.cancel();
+    speaking = false;
+    updateVoiceBtn();
+    return;
+  }
+  const text = lang[currentLang].desc[currentModel];
+  if (!text || !window.speechSynthesis) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = voiceLang[currentLang];
+  utter.rate = 0.9;
+  utter.onstart = () => { speaking = true; updateVoiceBtn(); };
+  utter.onend = () => { speaking = false; updateVoiceBtn(); };
+  utter.onerror = () => { speaking = false; updateVoiceBtn(); };
+  window.speechSynthesis.speak(utter);
 }
 
 updateUI();
