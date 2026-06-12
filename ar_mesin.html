@@ -121,6 +121,10 @@
     <span class="icon">🔩</span>
     <span class="label" data-key="bubut">Mesin Bubut</span>
   </div>
+  <div class="model-btn" onclick="setModel('milling',this)">
+    <span class="icon">🏗️</span>
+    <span class="label" data-key="milling">Mesin Milling</span>
+  </div>
   <div class="model-btn" onclick="setModel('cnc',this)">
     <span class="icon">🤖</span>
     <span class="label" data-key="cnc">Mesin CNC</span>
@@ -172,11 +176,13 @@ const lang = {
     voiceStop: "Berhenti",
     conveyor: "Conveyor Belt",
     bubut: "Mesin Bubut",
+    milling: "Mesin Milling",
     cnc: "Mesin CNC",
     generator: "Generator",
     desc: {
       conveyor: "Sistem transportasi material menggunakan belt bergerak yang didukung roller dan motor penggerak.",
       bubut: "Mesin perkakas untuk membentuk benda kerja dengan cara memutar benda dan menyayat dengan pahat.",
+      milling: "Mesin perkakas untuk menghilangkan material dari benda kerja menggunakan pisau berputar untuk membentuk permukaan atau profil tertentu.",
       cnc: "Mesin perkakas otomatis dikendalikan komputer untuk proses pemotongan dan pemesinan presisi.",
       generator: "Alat konversi energi mekanik menjadi energi listrik menggunakan prinsip induksi elektromagnetik."
     }
@@ -189,11 +195,13 @@ const lang = {
     voiceStop: "Stop",
     conveyor: "Conveyor Belt",
     bubut: "Lathe Machine",
+    milling: "Milling Machine",
     cnc: "CNC Machine",
     generator: "Generator",
     desc: {
       conveyor: "A material transport system using a moving belt supported by rollers and a drive motor.",
       bubut: "A machine tool that shapes workpieces by rotating and cutting with a tool bit.",
+      milling: "A machine tool used to remove material from a workpiece using a rotating cutter to create flat surfaces or profiles.",
       cnc: "Computer-controlled machine tool for precision cutting and machining operations.",
       generator: "Converts mechanical energy into electrical energy using electromagnetic induction."
     }
@@ -206,11 +214,13 @@ const lang = {
     voiceStop: "停止",
     conveyor: "传送带",
     bubut: "车床",
+    milling: "铣床",
     cnc: "数控机床",
     generator: "发电机",
     desc: {
       conveyor: "使用由滚轮和驱动电机支撑的移动皮带的物料运输系统。",
       bubut: "通过旋转工件并用刀具切削来成形工件的机床。",
+      milling: "一种利用旋转刀具从工件上切除材料以加工平面或特定轮廓的机床。",
       cnc: "计算机控制的机床，用于精密切削和加工操作。",
       generator: "利用电磁感应原理将机械能转换为电能的装置。"
     }
@@ -221,6 +231,7 @@ const voiceLang = { id: 'id-ID', en: 'en-US', zh: 'zh-CN' };
 const models = {
   conveyor: 'Conveyor.glb',
   bubut: 'mesin_bubut.glb',
+  milling: 'Miling.glb',
   cnc: 'mesin_cnc.glb',
   generator: 'Generator.glb'
 };
